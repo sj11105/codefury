@@ -1,21 +1,26 @@
-// pages/page.jsx
-import Head from 'next/head';
-import dynamic from 'next/dynamic';
+// src/app/page.js
+"use client";
 
-const Mapbox = dynamic(() => import('./components/Mapbox'), { ssr: false });
+import { useSession, signIn } from "next-auth/react";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-const Page = () => (
-  <>
-    <Head>
-      <link
-        href="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css"
-        rel="stylesheet"
-      />
-    </Head>
-    <div>
-      <Mapbox />
-    </div>
-  </>
-);
+const LandingPage = () => {
+  const { data: session } = useSession();
+  const router = useRouter();
 
-export default Page;
+  useEffect(() => {
+    if (session) {
+      router.push("/main");
+    }
+  }, [session, router]);
+
+  return (
+    <main>
+      <h1>Welcome to our website "XYZ"</h1>
+
+    </main>
+  );
+};
+
+export default LandingPage;
