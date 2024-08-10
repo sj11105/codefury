@@ -5,39 +5,57 @@ const Twilio = require('twilio');
 const cors = require('cors');
 
 const app = express();
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 
 const PORT = process.env.PORT || 3001;
 
-// Retrieve Twilio credentials from environment variables
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
+const twilioPhoneNumber = '+13867664736';
+
 const client = Twilio(accountSid, authToken);
 
-app.post('/send-sms', async (req, res) => {
-  const { recipients, body } = req.body;
+// Example mapping of areas to phone numbers
+const areaPhoneNumbers = {
+  'koramangala': '+917889169756',
+  'jayanagar': '+918651599266',
+  'whitefield': '+918792067476',
+  'kr circle': '+918310372710',
+};
 
-  if (!Array.isArray(recipients) || recipients.length === 0) {
-    return res.status(400).json({ success: false, error: 'Recipients list is required and must be an array.' });
+
+
+app.post('/send-sms', async (req, res) => {
+  const { area, body, isEmergency } = req.body;
+
+  console.log('Received Area:', area); // Debugging line
+
+  const recipient = isEmergency
+    ? areaPhoneNumbers[area.toLowerCase()] // Use the selected area's number for emergencies
+    : areaPhoneNumbers[area.toLowerCase()];
+
+  if (!recipient) {
+    return res.status(400).json({ success: false, error: 'Invalid area selected.' });
   }
 
   try {
-    const messages = await Promise.all(recipients.map(recipient =>
-      client.messages.create({
-        body: body,
-        from: '+13867664736',
-        to: recipient
-      })
-    ));
+    const message = await client.messages.create({
+      body: body,
+      from: twilioPhoneNumber,
+      to: recipient
+    });
 
     res.json({
       success: true,
-      messages: messages.map(message => ({ recipient: message.to, messageSid: message.sid }))
+      message: { recipient: message.to, messageSid: message.sid }
     });
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    console.error('Error sending SMS:', error);
+    res.status(500).json({ success: false, error: 'An error occurred while sending SMS: ' + error.message });
   }
 });
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
