@@ -55,8 +55,6 @@ def predict_resource_needs(disaster_type, severity='Moderate', urban_rural='urba
     # One-hot encode the input data
     input_encoded = pd.get_dummies(input_data, columns=['disaster_type', 'severity', 'urban_rural'])
     
-    # Align the input data with the training data
-    # Ensure the same columns as the training data
     for column in X_encoded.columns:
         if column not in input_encoded.columns:
             input_encoded[column] = 0
@@ -66,7 +64,6 @@ def predict_resource_needs(disaster_type, severity='Moderate', urban_rural='urba
     prediction = model.predict(input_encoded)
     return prediction[0]
 
-# Example usage
 disaster_type = input("Enter Disaster:")
 
 resource_needs = predict_resource_needs(disaster_type)
