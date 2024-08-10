@@ -18,6 +18,9 @@ function Navbar() {
                             Sign Up
                         </Link>
                     </li>
+                    <li>
+                        <Link href="/sms" className='text-gray-600 hover:text-blue-600'>Alert</Link>
+                    </li>
                 </ul>
             </div>
         </div>
