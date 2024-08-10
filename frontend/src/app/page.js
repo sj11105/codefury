@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 
 import axios from 'axios';
@@ -9,4 +10,18 @@ export default async function Home() {
          <Link href="sms">sms</Link>
         </div>
     );
+=======
+
+import Image from "next/image";
+import Navbar from "./components/Navbar";
+
+
+export default function Home() {
+  return (
+   <div>
+      <Navbar/>
+    
+   </div>
+  );
+>>>>>>> 84f6b24aac0961da6ca93fd16934877c74d053c0
 }
