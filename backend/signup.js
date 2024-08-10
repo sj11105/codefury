@@ -54,10 +54,13 @@ main().then(() => {
 }).catch((err) => console.error(err));
 
 async function main() {
-    await mongoose.connect('mongodb://localhost:27017/codefury');
+    await mongoose.connect('mongodb+srv://ifrahashraf48:6gW4kwWALEWNN5cl@web-app-cluster.scpayls.mongodb.net/?retryWrites=true&w=majority&appName=newtest');
 }
 
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3001', // Replace with your frontend URL
+    credentials: true // This allows the frontend to send cookies to the backend
+}));
 
 // Set up email transporter
 const transporter = nodemailer.createTransport({
@@ -65,8 +68,19 @@ const transporter = nodemailer.createTransport({
     auth: {
         user: process.env.email,
         pass: process.env.email_pass,
+
     }
 });
+
+let username1 = " ";
+let email1 = " ";
+let password1 = " ";
+let whatsappnumber1 = " ";
+let address1 = " ";
+let emailOtp1 = " ";
+let smsOtp1 = " ";
+
+
 
 // Step 1: Signup & OTP Generation
 app.post('/signup', async (req, res) => {
@@ -83,64 +97,72 @@ app.post('/signup', async (req, res) => {
             const otpExpires = Date.now() + 3 * 60 * 1000; // OTP expires in 3 minutes
 
             // Store OTPs and user data in the session
-            req.session.emailOtp = emailOtp;
-            req.session.smsOtp = smsOtp;
+            emailOtp1 = emailOtp;
+            smsOtp1 = smsOtp;
             req.session.otpExpires = otpExpires;
-            req.session.tempUser = { username, email, password, whatsappnumber, address };
+            username1 = username;
+            email1 = email;
+            password1 = password;
+            whatsappnumber1 = whatsappnumber;
+            address1 = address;
 
             // Send email with OTP
-            const mailOptions = {
+            const emailPromise = transporter.sendMail({
                 from: process.env.email,
                 to: email,
                 subject: 'OTP for Registration - 3 minutes expiry',
                 text: `Your OTP for Registration is ${emailOtp}`
-            };
-
-            transporter.sendMail(mailOptions, (error, info) => {
-                if (error) {
-                    return res.status(500).send("Failed to send email");
-                }
             });
 
             // Send SMS with OTP using Twilio
-            twilioClient.messages.create({
+            const smsPromise = twilioClient.messages.create({
                 body: `Your OTP for Registration is ${smsOtp}`,
                 from: process.env.TWILIO_PHONE_NUMBER,
                 to: whatsappnumber
-            }).then(message => {
-                console.log(`SMS sent: ${message.sid}`);
-                res.status(200).send('OTPs sent to your email and phone. Please verify.');
-            }).catch(error => {
-                console.error('Error sending SMS:', error);
-                res.status(500).send("Failed to send SMS");
             });
+
+            // Wait for both promises to resolve
+            Promise.all([emailPromise, smsPromise])
+                .then(() => {
+                    res.status(200).send('OTPs sent to your email and phone. Please verify.');
+                })
+                .catch(error => {
+                    console.error('Error sending OTPs:', error);
+                    res.status(500).send("Failed to send OTPs");
+                });
         }
     } catch (err) {
         res.status(500).send(`Error: ${err.message}`);
     }
 });
 
+
 // Step 2: OTP Verification & Registration
 app.post('/verify-otp', async (req, res) => {
     try {
         const { emailOtp, smsOtp } = req.body;
-
+        console.log(`email otp ${emailOtp1} sms otp ${smsOtp1}`)
         // Check if OTPs match and haven't expired
-        if (req.session.emailOtp !== emailOtp || req.session.smsOtp !== smsOtp || Date.now() > req.session.otpExpires) {
+        if (emailOtp1 !== emailOtp || smsOtp1 !== smsOtp || Date.now() > req.session.otpExpires) {
             return res.status(400).send('Invalid or expired OTP');
         }
 
         // Register the user with the data stored in session
-        const { username, email, password, whatsappnumber, address } = req.session.tempUser;
-        let phoneNumber = whatsappnumber.slice(2);
-        let user = new User({ username, email, phoneNumber, address });
-        let reguser = await User.register(user, password);
+        phoneNumber = whatsappnumber1.slice(2);
+        let user = new User({ username1, email1, phoneNumber, address1 });
+        let reguser = await User.register(user, password1);
 
         // Clear the session data after registration
-        req.session.emailOtp = null;
-        req.session.smsOtp = null;
+        emailOtp1 = null;
+        smsOtp1 = null;
         req.session.otpExpires = null;
-        req.session.tempUser = null;
+        username1 = null
+        email1 = null;
+        password1 = null;
+        whatsappnumber1 = null;
+        address1 = null;
+
+
 
         req.login(reguser, (err) => {
             if (err) return next(err);
@@ -151,3 +173,5 @@ app.post('/verify-otp', async (req, res) => {
         res.status(500).send(`Error: ${err.message}`);
     }
 });
+
+/* mongodb+srv://ifrahashraf48:6gW4kwWALEWNN5cl@web-app-cluster.scpayls.mongodb.net/ */
