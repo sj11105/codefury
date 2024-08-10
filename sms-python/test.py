@@ -1,13 +1,19 @@
+import os
+from dotenv import load_dotenv
 from twilio.rest import Client
 
-# Your Account SID and Auth Token from twilio.com/console
-account_sid = 'AC2891b4ee0a22b6516e2cadec2f4f863e'
-auth_token = 'bad06e2d9fd00fd2beced59167006acb'
+# Load environment variables from .env file
+load_dotenv()
+
+# Get Twilio credentials from environment variables
+account_sid = os.getenv('TWILIO_ACCOUNT_SID')
+auth_token = os.getenv('TWILIO_AUTH_TOKEN')
 
 # Initialize the Twilio client
 client = Client(account_sid, auth_token)
+
 # List of organization phone numbers
-recipients = ['+918792067476',  '+917889169756']
+recipients = ['+918792067476', '+917889169756']
 
 for recipient in recipients:
     message = client.messages.create(
