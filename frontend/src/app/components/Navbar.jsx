@@ -1,27 +1,33 @@
-import Link from 'next/link';
+// src/app/components/Navbar.js
+"use client";
 
-function Navbar() {
-    return (
-        <div className="navbar bg-[#9fb6c3] shadow-md border-b border-gray-200">
-            <div className="flex-1">
-                <a className="btn btn-ghost text-xl font-bold text-gray-800 hover:text-blue-600">Natural Disaster</a>
-            </div>
-            <div className="flex-none">
-                <ul className="menu menu-horizontal px-1 space-x-4">
-                    <li>
-                        <Link href="/signin" className="text-gray-600 hover:text-blue-600">
-                            Sign In
-                        </Link>
-                    </li>
-                    <li>
-                        <Link href="/signup" className="text-gray-600 hover:text-blue-600">
-                            Sign Up
-                        </Link>
-                    </li>
-                </ul>
-            </div>
+import { signIn, signOut, useSession } from "next-auth/react";
+import Link from "next/link";
+
+const Navbar = () => {
+  const { data: session } = useSession();
+
+  return (
+    <nav className="bg-gray-800 p-4">
+      <div className="container mx-auto flex justify-between items-center">
+        <Link href="/" className="text-white text-lg font-bold">Home</Link>
+        <div>
+          {session ? (
+            <>
+              <span className="text-white mr-4">Welcome, {session.user.name}</span>
+              <button onClick={() => signOut()} className="text-white bg-blue-500 px-4 py-2 rounded">
+                Sign Out
+              </button>
+            </>
+          ) : (
+            <button onClick={() => signIn()} className="text-white bg-blue-500 px-4 py-2 rounded">
+              Sign In
+            </button>
+          )}
         </div>
-    );
-}
+      </div>
+    </nav>
+  );
+};
 
 export default Navbar;

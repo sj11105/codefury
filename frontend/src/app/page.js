@@ -1,13 +1,26 @@
+// src/app/page.js
+"use client";
 
-import Image from "next/image";
-import Navbar from "./components/Navbar";
+import { useSession, signIn } from "next-auth/react";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
+const LandingPage = () => {
+  const { data: session } = useSession();
+  const router = useRouter();
 
-export default function Home() {
+  useEffect(() => {
+    if (session) {
+      router.push("/main");
+    }
+  }, [session, router]);
+
   return (
-   <div>
-      <Navbar/>
-    
-   </div>
+    <main>
+      <h1>Welcome to our website "XYZ"</h1>
+
+    </main>
   );
-}
+};
+
+export default LandingPage;
