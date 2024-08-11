@@ -23,7 +23,6 @@ function Weather() {
       setError("");
       console.log(data);
 
-      // Use optional chaining to avoid issues if background is undefined
       const weatherCondition = data.weather[0]?.main;
       setBackground(weatherCondition);
 
@@ -34,7 +33,7 @@ function Weather() {
       };
       
       const imgUrl = backgroundImages[weatherCondition?.toLowerCase()] || '';
-      document.body.style.backgroundImage = imgUrl;
+      document.body.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), ${imgUrl}`;
     } catch (error) {
       setError(error.message);
       setWeather(null);
@@ -49,32 +48,32 @@ function Weather() {
 
   return (
     <>
-      <div className="card weathercard" style={{ width: "18rem", justifyContent: 'center' }}>
+      <div className="card bg-base-100 shadow-xl w-80 mx-auto mt-10">
         <div className="card-body">
-          <h5 className="card-title center">Weather</h5>
-          <div>
+          <h5 className="card-title text-2xl font-bold text-center">Weather</h5>
+          <div className="flex flex-col items-center">
             <input
-              className="input"
+              className="input input-bordered w-full max-w-xs mb-4"
               type="text"
               placeholder="Enter city name"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-            <button onClick={handleSearch} className="btn btn-info btnw">Search</button>
+            <button onClick={handleSearch} className="btn btn-primary w-full max-w-xs">Search</button>
           </div>
-          {error && <p>{error}</p>}
+          {error && <p className="text-red-500 text-center mt-2">{error}</p>}
           {weather && (
-            <div className="info">
-              <h2>{weather.name}</h2>
-              <p>Temperature: {weather.main.temp}°C</p>
-              <p>Feels Like: {weather.main.feels_like}°C</p>
-              <p>Min Temperature: {weather.main.temp_min}°C</p>
-              <p>Max Temperature: {weather.main.temp_max}°C</p>
-              <p>Pressure: {weather.main.pressure} hPa</p>
-              <p>Humidity: {weather.main.humidity}%</p>
-              <p>Wind Speed: {weather.wind.speed} m/s</p>
-              <p>Wind Gust: {weather.wind.gust ? weather.wind.gust + ' m/s' : 'N/A'}</p>
-              <p>Description: {weather.weather[0].description}</p>
+            <div className="text-center mt-4">
+              <h2 className="text-xl font-semibold">{weather.name}</h2>
+              <p>Temperature: <span className="font-semibold">{weather.main.temp}°C</span></p>
+              <p>Feels Like: <span className="font-semibold">{weather.main.feels_like}°C</span></p>
+              <p>Min Temperature: <span className="font-semibold">{weather.main.temp_min}°C</span></p>
+              <p>Max Temperature: <span className="font-semibold">{weather.main.temp_max}°C</span></p>
+              <p>Pressure: <span className="font-semibold">{weather.main.pressure} hPa</span></p>
+              <p>Humidity: <span className="font-semibold">{weather.main.humidity}%</span></p>
+              <p>Wind Speed: <span className="font-semibold">{weather.wind.speed} m/s</span></p>
+              <p>Wind Gust: <span className="font-semibold">{weather.wind.gust ? weather.wind.gust + ' m/s' : 'N/A'}</span></p>
+              <p>Description: <span className="font-semibold">{weather.weather[0].description}</span></p>
             </div>
           )}
         </div>
