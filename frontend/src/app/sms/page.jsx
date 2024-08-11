@@ -113,7 +113,7 @@ export default function SendSMS() {
 
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
-              <label htmlFor="body" className="block text-gray-600 text-sm font-medium mb-2">Message:</label>
+              <label htmlFor="body" className="block text-gray-600 text-sm fon t-medium mb-2">Message:</label>
               <textarea
                 id="body"
                 name="body"

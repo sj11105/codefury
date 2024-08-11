@@ -1,0 +1,60 @@
+.carousel {
+  width: 100%;
+  overflow: hidden;
+margin-left: 120px;
+  position: relative;
+  padding: 100px;
+}
+
+.slide-container {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+}
+
+.slide {
+  flex: 0 0 100%;
+  transition: transform 0.5s ease-in-out;
+  position: relative;
+}
+
+.slide img {
+  width: 100%;
+  height: 450px;
+  border-radius: 50%;
+  display: block;
+}
+
+.caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  color: white;
+  text-align: center;
+}
+
+.caption h3 {
+  margin: 0;
+}
+
+/* Optional: Adjust styles for better UI */
+.carousel {
+  max-width: 800px; /* Adjust as per your design */
+  margin: 20px auto;
+}
+
+.slide {
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.slide img {
+  border-radius: 8px;
+}
+
+/* Optional: Add hover effects */
+.slide:hover {
+  transform: scale(1.02);
+}
