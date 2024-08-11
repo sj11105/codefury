@@ -5,7 +5,7 @@ import { useSession, signIn } from "next-auth/react";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-const LandingPage = () => {
+const page = () => {
   const { data: session } = useSession();
   const router = useRouter();
 
@@ -23,4 +23,4 @@ const LandingPage = () => {
   );
 };
 
-export default LandingPage;
+export default page;
