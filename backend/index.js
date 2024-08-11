@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const Twilio = require('twilio');
 const cors = require('cors');
+const geolib = require('geolib'); // Install this package for geolocation utilities
 
 const app = express();
 app.use(cors());
@@ -16,32 +17,52 @@ const twilioPhoneNumber = '+13867664736';
 
 const client = Twilio(accountSid, authToken);
 
-// Example mapping of areas to phone numbers
+// Example mapping of areas to phone numbers and their respective coordinates
 const areaPhoneNumbers = {
-  'koramangala': '+917889169756',
-  'jayanagar': '+918651599266',
-  'whitefield': '+918792067476',
-  'kr circle': '+918310372710',
+  'koramangala': { phone: '+917889169756', coords: { latitude: 12.9345, longitude: 77.6192 } },
+  'jayanagar': { phone: '+918651599266', coords: { latitude: 12.9250, longitude: 77.5938 } },
+  'whitefield': { phone: '+918792067476', coords: { latitude: 12.9698, longitude: 77.7500 } },
+  'kr circle': { phone: '+918310372710', coords: { latitude: 12.9766, longitude: 77.5906 } },
 };
 
+// Function to find the nearest area based on the user's location
+function findNearestArea(latitude, longitude) {
+  let nearestArea = null;
+  let shortestDistance = Infinity;
 
+  for (const [area, data] of Object.entries(areaPhoneNumbers)) {
+    const distance = geolib.getDistance(
+      { latitude, longitude },
+      data.coords
+    );
 
-app.post('/send-sms', async (req, res) => {
-  const { area, body, isEmergency } = req.body;
-
-  console.log('Received Area:', area); // Debugging line
-
-  const recipient = isEmergency
-    ? areaPhoneNumbers[area.toLowerCase()] // Use the selected area's number for emergencies
-    : areaPhoneNumbers[area.toLowerCase()];
-
-  if (!recipient) {
-    return res.status(400).json({ success: false, error: 'Invalid area selected.' });
+    if (distance < shortestDistance) {
+      shortestDistance = distance;
+      nearestArea = area;
+    }
   }
 
+  return nearestArea;
+}
+
+app.post('/send-sms', async (req, res) => {
+  const { latitude, longitude, body, isEmergency } = req.body;
+
+  console.log('Received Coordinates:', latitude, longitude); // Debugging line
+
+  const nearestArea = findNearestArea(latitude, longitude);
+  if (!nearestArea) {
+    return res.status(400).json({ success: false, error: 'Unable to determine the nearest area.' });
+  }
+
+  const recipient = areaPhoneNumbers[nearestArea].phone;
+
   try {
+    // Include the area name in the message body
+    const fullMessageBody = `${body}\n\nLocation: ${nearestArea}`;
+
     const message = await client.messages.create({
-      body: body,
+      body: fullMessageBody,
       from: twilioPhoneNumber,
       to: recipient
     });
