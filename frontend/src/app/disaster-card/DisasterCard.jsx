@@ -5,7 +5,7 @@ import Link from 'next/link';
 const DisasterCard = ({ link, imageUrl, description  , name}) => {
     return (
         <Link href={link} passHref>
-            <div className="w-96 h-96 bg-white shadow-lg hover:shadow-xl transition-shadow transition-transform duration-300 transform hover:scale-105 cursor-pointer rounded-lg overflow-hidden mt-8 ml-8">
+            <div className="w-96 h-96 bg-white shadow-lg hover:shadow-xl  transition-transform duration-300 transform hover:scale-105 cursor-pointer rounded-lg overflow-hidden mt-8 ml-8">
                 <figure className="w-full h-3/4">
                     <img
                         src={imageUrl}
