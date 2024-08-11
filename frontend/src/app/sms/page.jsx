@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import MapComponent from '../components/MapComponent';
 
 export default function SendSMS() {
   const [area, setArea] = useState('');
@@ -7,11 +8,15 @@ export default function SendSMS() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // List of areas in Bangalore
-  const areas = ['koramangala', 'jayanagar', 'whitefield', 'kr circle'];
-
   // Predefined message for emergencies
   const emergencyMessage = 'This is an emergency alert! Please respond immediately.';
+
+  // Function to get user's current location
+  const getLocation = () => {
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject);
+    });
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -19,12 +24,16 @@ export default function SendSMS() {
     setError('');
 
     try {
+      const position = await getLocation(); // Get user's location
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+
       const response = await fetch('http://localhost:3001/send-sms', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ area, body, isEmergency: false }),
+        body: JSON.stringify({ latitude, longitude, body, isEmergency: false }),
       });
 
       const contentType = response.headers.get('content-type');
@@ -53,12 +62,16 @@ export default function SendSMS() {
     setError('');
 
     try {
+      const position = await getLocation(); // Get user's location for emergency
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+
       const response = await fetch('http://localhost:3001/send-sms', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ area, body: emergencyMessage, isEmergency: true }), // Sending emergency flag
+        body: JSON.stringify({ latitude, longitude, body: emergencyMessage, isEmergency: true }), // Sending emergency flag
       });
 
       const contentType = response.headers.get('content-type');
@@ -81,60 +94,49 @@ export default function SendSMS() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
-      <div className="max-w-lg w-full bg-white shadow-lg rounded-lg p-6">
-        <h1 className="text-2xl font-semibold mb-6 text-center text-gray-800">Send SMS</h1>
-        
-        <div className="mb-6">
-          <button
-            onClick={handleEmergency}
-            className="w-full py-2 px-4 font-semibold rounded-md text-white bg-red-500 hover:bg-red-600 transition-colors duration-300"
-          >
-            Send Emergency Alert
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="area" className="block text-gray-600 text-sm font-medium mb-2">Select Area:</label>
-            <select
-              id="area"
-              name="area"
-              value={area}
-              onChange={(e) => setArea(e.target.value)}
-              required
-              className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              <option value="">Select your area</option>
-              {areas.map((area, index) => (
-                <option key={index} value={area}>{area}</option>
-              ))}
-            </select>
-          </div>
-          <div className="mb-4">
-            <label htmlFor="body" className="block text-gray-600 text-sm font-medium mb-2">Message:</label>
-            <textarea
-              id="body"
-              name="body"
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-              required
-              className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              rows="4"
-            ></textarea>
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full py-2 px-4 font-semibold rounded-md text-white ${
-              loading ? 'bg-gray-400' : 'bg-indigo-500 hover:bg-indigo-600'
-            } transition-colors duration-300`}
-          >
-            {loading ? 'Sending...' : 'Send SMS'}
-          </button>
-        </form>
-        {error && <p className="mt-4 text-red-500 text-center">{error}</p>}
+    <>
+      <div>
+        <MapComponent />
       </div>
-    </div>
+      <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
+        <div className="max-w-lg w-full bg-white shadow-lg rounded-lg p-6">
+          <h1 className="text-2xl font-semibold mb-6 text-center text-gray-800">Send SMS</h1>
+          
+          <div className="mb-6">
+            <button
+              onClick={handleEmergency}
+              className="w-full py-2 px-4 font-semibold rounded-md text-white bg-red-500 hover:bg-red-600 transition-colors duration-300"
+            >
+              Send Emergency Alert
+            </button>
+          </div>
+
+          <form onSubmit={handleSubmit}>
+            <div className="mb-4">
+              <label htmlFor="body" className="block text-gray-600 text-sm font-medium mb-2">Message:</label>
+              <textarea
+                id="body"
+                name="body"
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                required
+                className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                rows="4"
+              ></textarea>
+            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className={`w-full py-2 px-4 font-semibold rounded-md text-white ${
+                loading ? 'bg-gray-400' : 'bg-indigo-500 hover:bg-indigo-600'
+              } transition-colors duration-300`}
+            >
+              {loading ? 'Sending...' : 'Send SMS'}
+            </button>
+          </form>
+          {error && <p className="mt-4 text-red-500 text-center">{error}</p>}
+        </div>
+      </div>
+    </>
   );
 }
