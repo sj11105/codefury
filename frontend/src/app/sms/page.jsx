@@ -66,7 +66,7 @@ export default function SendSMS() {
       const latitude = position.coords.latitude;
       const longitude = position.coords.longitude;
 
-      const response = await fetch('http://localhost:3001/send-sms', {
+      const response = await fetch('https://natural-disaster-be.onrender.com/send-sms', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
