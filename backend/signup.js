@@ -54,7 +54,7 @@ main().then(() => {
 }).catch((err) => console.error(err));
 
 async function main() {
-    await mongoose.connect('mongodb+srv://ifrahashraf48:6gW4kwWALEWNN5cl@web-app-cluster.scpayls.mongodb.net/?retryWrites=true&w=majority&appName=newtest');
+    await mongoose.connect('enter the mongo uri');
 }
 
 app.use(cors({
