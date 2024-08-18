@@ -173,5 +173,3 @@ app.post('/verify-otp', async (req, res) => {
         res.status(500).send(`Error: ${err.message}`);
     }
 });
-
-/* mongodb+srv://ifrahashraf48:6gW4kwWALEWNN5cl@web-app-cluster.scpayls.mongodb.net/ */
